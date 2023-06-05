@@ -29,8 +29,8 @@ public:
     {
       std::unique_lock<std::mutex> locker(mu);
       cond.wait(locker, [this]()
-                { return this->_buffer.size() < this->_size; }); // Wait till there is free space in the buffer to aquire the lock.
-      this->_buffer.push_back(num);                              // Add the work
+                { return this->buffer_.size() < this->size_; }); // Wait till there is free space in the buffer to aquire the lock.
+      this->buffer_.push_back(num);                              // Add the work
       locker.unlock();                                           // Remove the lock
       cond.notify_all();                                         // Notify everyone who is waiting to recheck.
     }
@@ -42,9 +42,9 @@ public:
     {
       std::unique_lock<std::mutex> locker(mu);
       cond.wait(locker, [this]()
-                { return this->_buffer.size() > 0; }); // Wait around if the buffer is empty until it's not empty
-      int back = this->_buffer.back();                 // Get the last value to return
-      this->_buffer.pop_back();                        // Remove the last value from the buffer
+                { return this->buffer_.size() > 0; }); // Wait around if the buffer is empty until it's not empty
+      int back = this->buffer_.back();                 // Get the last value to return
+      this->buffer_.pop_back();                        // Remove the last value from the buffer
       locker.unlock();
       cond.notify_all();
       return back;
@@ -54,8 +54,8 @@ public:
   Buffer() {}
 
 private:
-  std::deque<int> _buffer;
-  const unsigned int _size = 10; // Max size of our queue
+  std::deque<int> buffer_;
+  const unsigned int size_ = 10; // Max size of our queue
 };
 
 class Producer
