@@ -33,6 +33,7 @@ public:
       this->buffer_.push_back(num);                              // Add the work
       locker.unlock();                                           // Remove the lock
       cond.notify_all();                                         // Notify everyone who is waiting to recheck.
+      return;
     }
   }
 
